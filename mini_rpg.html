@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mini RPG</title>
+<style>
+body{margin:0;background:#1b1b1b;color:white;font-family:Arial}
+#game{max-width:900px;margin:auto;padding:20px}
+#log{height:260px;overflow:auto;background:#111;padding:10px;border-radius:10px}
+button{padding:12px;margin:5px;font-size:16px}
+.stats{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:10px}
+.card{background:#222;padding:10px;border-radius:10px}
+</style>
+</head>
+<body>
+<div id="game">
+<h1>⚔️ Mini RPG</h1>
+
+<div class="stats">
+<div class="card">❤️ Vida: <span id="hp">100</span></div>
+<div class="card">⭐ Nível: <span id="lvl">1</span></div>
+<div class="card">✨ XP: <span id="xp">0</span></div>
+<div class="card">🪙 Ouro: <span id="gold">0</span></div>
+</div>
+
+<div id="log"></div>
+
+<div>
+<button onclick="explore()">Explorar</button>
+<button onclick="rest()">Descansar</button>
+<button onclick="shop()">Loja</button>
+</div>
+</div>
+
+<script>
+let player={hp:100,maxHp:100,lvl:1,xp:0,gold:0,atk:10};
+
+function msg(t){
+log.innerHTML += t+"<br>";
+log.scrollTop=log.scrollHeight;
+}
+
+function update(){
+hp.textContent=player.hp;
+lvl.textContent=player.lvl;
+xp.textContent=player.xp;
+gold.textContent=player.gold;
+}
+
+function levelUp(){
+while(player.xp>=player.lvl*50){
+player.xp-=player.lvl*50;
+player.lvl++;
+player.maxHp+=20;
+player.hp=player.maxHp;
+player.atk+=5;
+msg("🎉 Você subiu para o nível "+player.lvl);
+}
+}
+
+function explore(){
+const r=Math.random();
+
+if(r<0.7){
+let enemyHp=20+player.lvl*15;
+let dmg=Math.floor(Math.random()*10)+5;
+
+msg("👹 Um monstro apareceu!");
+
+while(enemyHp>0 && player.hp>0){
+enemyHp-=player.atk;
+if(enemyHp>0) player.hp-=dmg;
+}
+
+if(player.hp<=0){
+msg("💀 Você foi derrotado. Recuperando...");
+player.hp=player.maxHp;
+return update();
+}
+
+const xpGain=10+player.lvl*5;
+const goldGain=5+Math.floor(Math.random()*15);
+
+player.xp+=xpGain;
+player.gold+=goldGain;
+
+msg("🏆 Vitória! +"+xpGain+" XP, +"+goldGain+" ouro");
+levelUp();
+}else{
+const goldGain=10+Math.floor(Math.random()*20);
+player.gold+=goldGain;
+msg("💰 Você encontrou um tesouro! +"+goldGain+" ouro");
+}
+
+update();
+}
+
+function rest(){
+player.hp=player.maxHp;
+msg("🏕️ Você descansou e recuperou toda a vida.");
+update();
+}
+
+function shop(){
+if(player.gold>=50){
+player.gold-=50;
+player.atk+=5;
+msg("🗡️ Você comprou uma espada melhor! Ataque +5");
+}else{
+msg("🏪 Ouro insuficiente. Precisa de 50.");
+}
+update();
+}
+
+msg("Bem-vindo ao reino!");
+update();
+</script>
+</body>
+</html>
